@@ -150,7 +150,7 @@ def spreadsheetSaver(tableName, dados):
     email = email.result
 
     password = droid.dialogGetPassword("Digite a senha",\
-                                       "Senha para conectar aod google Docs")
+                                       "Senha para conectar ao google Docs")
     password = password.result
 
     
