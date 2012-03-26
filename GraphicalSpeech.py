@@ -190,6 +190,7 @@ def sobre():
     droid.dialogShow()
     
 def catDado():
+    cont = 0
     while True:
         point = droid.recognizeSpeech().result
         
@@ -208,7 +209,21 @@ def catDado():
             else:
                 droid.ttsSpeak("Diga um numero")
         except:
+            cont += 1
             droid.ttsSpeak("Diga um numero")
+            if(cont == 3):
+                droid.dialogCreateAlert("Falha",
+                """Falha no reconhecimento dos dados.
+                Tentar novamente: OK
+                Ou clique em Sair""")
+                droid.dialogSetPositiveButtonText("OK")
+                droid.dialogSetNegativeButtonText("Sair")
+                droid.dialogShow()
+                resposta = droid.dialogGetResponse().result
+                if resposta['which'] == 'positive':
+                    cont = 0
+                else:
+                    return None
             
 def MaxMindado(dado):
     x0 = dado[0]
@@ -225,7 +240,10 @@ def dadosSpeech(npoints):
     data = []
     for i in range(npoints):
         point = catDado()
-        data.append(point)
+        if( point != None):
+            data.append(point)
+        else:
+            return None
     return data
         
         
@@ -284,6 +302,8 @@ def eventLoop():
             id = event["data"]["id"]
             resultado = ""
             r1 = False
+            datay = None
+            datax = None
 
 
             if id == "button1":                
@@ -300,16 +320,17 @@ def eventLoop():
                     if resp1['which'] == 'positive':
                         datay = dadosSpeech(nPontos)
 
-                    droid.dialogCreateAlert("Dados x","Entrar dados de x")
-                    droid.dialogSetPositiveButtonText("O.K.")
-                    droid.dialogShow()
-                    resp2 = droid.dialogGetResponse().result
+                    if( datay != None):
+                        droid.dialogCreateAlert("Dados x","Entrar dados de x")
+                        droid.dialogSetPositiveButtonText("O.K.")
+                        droid.dialogShow()
+                        resp2 = droid.dialogGetResponse().result
                     
-                    if resp2['which'] == 'positive':
-                        datax = dadosSpeech(nPontos)
-
-                    lisDicDados = dicDadosGenerate(datay,datax)
-                    r1 = True
+                        if resp2['which'] == 'positive':
+                            datax = dadosSpeech(nPontos)
+                        if(datax != None):
+                            lisDicDados = dicDadosGenerate(datay,datax)
+                            r1 = True
                 else:
                     resultado = "Entre com o numero de pontos"
                     droid.makeToast(resultado)
